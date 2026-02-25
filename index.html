@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Repair Academy — Master Hardware & Maintenance</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Three.js for 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- SPLASH SCREEN -->
+    <div id="splash-screen" class="splash">
+        <div class="splash-content">
+            <div class="splash-icon">
+                <i class="fas fa-microchip"></i>
+            </div>
+            <h1 class="splash-title">Computer Repair Academy</h1>
+            <p class="splash-subtitle">Master Hardware Maintenance & Repair</p>
+            <div class="splash-loader">
+                <div class="loader-bar"><div class="loader-fill"></div></div>
+                <span class="loader-text">Loading learning environment...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app" class="app hidden">
+
+        <!-- TOP NAVIGATION -->
+        <header class="top-nav">
+            <div class="nav-left">
+                <button id="sidebar-toggle" class="nav-btn" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <i class="fas fa-microchip"></i>
+                    <span>CRA</span>
+                </div>
+            </div>
+            <div class="nav-center">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Search units, terms, topics..." autocomplete="off">
+                    <div id="search-results" class="search-dropdown hidden"></div>
+                </div>
+            </div>
+            <div class="nav-right">
+                <button id="voice-nav-btn" class="nav-btn" title="Voice Navigation">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button id="theme-toggle" class="nav-btn" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="font-size-btn" class="nav-btn" title="Text Size">
+                    <i class="fas fa-text-height"></i>
+                </button>
+                <div class="user-profile" id="user-profile-btn">
+                    <div class="avatar">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <span id="user-name-display">Student</span>
+                    <div class="xp-badge" id="xp-badge">0 XP</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Course Navigator</h3>
+                <div class="progress-ring-container">
+                    <svg class="progress-ring" width="80" height="80">
+                        <circle class="progress-ring-bg" cx="40" cy="40" r="35"/>
+                        <circle class="progress-ring-fill" id="overall-progress-ring" cx="40" cy="40" r="35"/>
+                    </svg>
+                    <span class="progress-text" id="overall-progress-text">0%</span>
+                </div>
+            </div>
+
+            <div class="sidebar-tabs">
+                <button class="stab active" data-tab="units-tab">
+                    <i class="fas fa-book"></i> Units
+                </button>
+                <button class="stab" data-tab="glossary-tab">
+                    <i class="fas fa-spell-check"></i> Glossary
+                </button>
+                <button class="stab" data-tab="bookmarks-tab">
+                    <i class="fas fa-bookmark"></i> Saved
+                </button>
+            </div>
+
+            <!-- Units List -->
+            <div id="units-tab" class="sidebar-tab-content active">
+                <div class="level-filter">
+                    <button class="filter-btn active" data-level="all">All</button>
+                    <button class="filter-btn" data-level="beginner">Beginner</button>
+                    <button class="filter-btn" data-level="intermediate">Intermediate</button>
+                    <button class="filter-btn" data-level="advanced">Advanced</button>
+                    <button class="filter-btn" data-level="professional">Professional</button>
+                </div>
+                <div id="units-list" class="units-list"></div>
+            </div>
+
+            <!-- Glossary -->
+            <div id="glossary-tab" class="sidebar-tab-content">
+                <input type="text" id="glossary-search" class="glossary-search" placeholder="Search terms...">
+                <div id="glossary-list" class="glossary-list"></div>
+            </div>
+
+            <!-- Bookmarks -->
+            <div id="bookmarks-tab" class="sidebar-tab-content">
+                <div id="bookmarks-list" class="bookmarks-list">
+                    <p class="empty-state">No bookmarks yet. Click the bookmark icon on any unit.</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main id="main-content" class="main-content">
+
+            <!-- DASHBOARD VIEW -->
+            <section id="dashboard-view" class="view active">
+                <div class="dashboard">
+                    <div class="welcome-banner">
+                        <div class="welcome-text">
+                            <h1>Welcome to Computer Repair Academy!</h1>
+                            <p>Your comprehensive journey from beginner to professional computer technician. 120+ units covering every aspect of computer maintenance, repair, and diagnostics.</p>
+                            <button id="start-learning-btn" class="btn btn-primary btn-lg">
+                                <i class="fas fa-play"></i> Start Learning
+                            </button>
+                            <button id="continue-learning-btn" class="btn btn-secondary btn-lg hidden">
+                                <i class="fas fa-forward"></i> Continue Learning
+                            </button>
+                        </div>
+                        <div class="welcome-character" id="welcome-character">
+                            <!-- Cartoon character rendered here -->
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-units-completed">0</span>
+                                <span class="stat-label">Units Completed</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-tests-passed">0</span>
+                                <span class="stat-label">Tests Passed</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-xp">0</span>
+                                <span class="stat-label">Total XP</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-streak">0</span>
+                                <span class="stat-label">Day Streak</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-time">0h</span>
+                                <span class="stat-label">Study Time</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-rank">Novice</span>
+                                <span class="stat-label">Current Rank</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-sections">
+                        <div class="dash-section">
+                            <h3><i class="fas fa-chart-line"></i> Learning Progress</h3>
+                            <canvas id="progress-chart" height="200"></canvas>
+                        </div>
+                        <div class="dash-section">
+                            <h3><i class="fas fa-trophy"></i> Achievements</h3>
+                            <div id="achievements-grid" class="achievements-grid"></div>
+                        </div>
+                        <div class="dash-section full-width">
+                            <h3><i class="fas fa-lightbulb"></i> Suggest a Topic</h3>
+                            <div class="suggest-topic">
+                                <textarea id="topic-suggestion" placeholder="Is there a topic you'd like us to cover? Describe it here..."></textarea>
+                                <button id="submit-suggestion" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Submit Suggestion
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- UNIT VIEW -->
+            <section id="unit-view" class="view">
+                <div class="unit-container">
+                    <!-- Unit Header -->
+                    <div class="unit-header">
+                        <div class="unit-breadcrumb">
+                            <a href="#" id="back-to-dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                            <i class="fas fa-chevron-right"></i>
+                            <span id="unit-level-badge" class="level-badge">Beginner</span>
+                            <i class="fas fa-chevron-right"></i>
+                            <span id="unit-breadcrumb-title">Unit Title</span>
+                        </div>
+                        <div class="unit-title-row">
+                            <h1 id="unit-title"></h1>
+                            <div class="unit-actions">
+                                <button id="unit-bookmark-btn" class="icon-btn" title="Bookmark">
+                                    <i class="far fa-bookmark"></i>
+                                </button>
+                                <button id="unit-voice-btn" class="icon-btn" title="Read Aloud">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                                <button id="unit-notes-btn" class="icon-btn" title="Open Notes">
+                                    <i class="fas fa-sticky-note"></i>
+                                </button>
+                                <button id="unit-sim-btn" class="icon-btn" title="Open 3D Lab">
+                                    <i class="fas fa-cube"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="unit-meta">
+                            <span><i class="fas fa-clock"></i> <span id="unit-duration"></span></span>
+                            <span><i class="fas fa-signal"></i> <span id="unit-difficulty"></span></span>
+                            <span><i class="fas fa-list-ol"></i> <span id="unit-section-count"></span> sections</span>
+                        </div>
+                        <div class="unit-progress-bar">
+                            <div class="unit-progress-fill" id="unit-progress-fill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cartoon Teacher Panel -->
+                    <div id="teacher-panel" class="teacher-panel">
+                        <div class="teacher-character" id="teacher-character"></div>
+                        <div class="teacher-speech" id="teacher-speech">
+                            <div class="speech-bubble">
+                                <p id="teacher-text">Welcome! Let's learn together. Click "Start Lesson" to begin!</p>
+                            </div>
+                            <div class="teacher-controls">
+                                <button id="teacher-speak-btn" class="btn btn-sm">
+                                    <i class="fas fa-play"></i> Speak
+                                </button>
+                                <button id="teacher-pause-btn" class="btn btn-sm hidden">
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                                <button id="teacher-next-btn" class="btn btn-sm">
+                                    <i class="fas fa-forward"></i> Next
+                                </button>
+                                <select id="teacher-voice-select" class="voice-select">
+                                    <option value="default">Default Voice</option>
+                                </select>
+                                <input type="range" id="teacher-speed" min="0.5" max="2" step="0.1" value="1" title="Speed">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unit Content Sections -->
+                    <div id="unit-content" class="unit-content">
+                        <!-- Dynamically populated -->
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="unit-nav">
+                        <button id="prev-section-btn" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <span id="section-indicator">Section 1 of 10</span>
+                        <button id="next-section-btn" class="btn btn-primary">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Take Test Button -->
+                    <div id="take-test-container" class="take-test-container hidden">
+                        <div class="test-ready-card">
+                            <i class="fas fa-clipboard-check"></i>
+                            <h2>Ready for the Unit Test?</h2>
+                            <p>You've completed all sections. Test your knowledge to unlock the next unit!</p>
+                            <button id="take-test-btn" class="btn btn-primary btn-lg">
+                                <i class="fas fa-pencil-alt"></i> Take Test
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TEST VIEW -->
+            <section id="test-view" class="view">
+                <div class="test-container">
+                    <div class="test-header">
+                        <h2 id="test-title">Unit Test</h2>
+                        <div class="test-timer">
+                            <i class="fas fa-stopwatch"></i>
+                            <span id="test-timer-display">00:00</span>
+                        </div>
+                        <div class="test-progress">
+                            <span id="test-question-indicator">Question 1 of 20</span>
+                            <div class="test-progress-bar">
+                                <div class="test-progress-fill" id="test-progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="test-content" class="test-content">
+                        <!-- Questions rendered here -->
+                    </div>
+                    <div class="test-nav">
+                        <button id="test-prev-btn" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button id="test-next-btn" class="btn btn-primary">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button id="test-submit-btn" class="btn btn-success hidden">
+                            <i class="fas fa-check"></i> Submit Test
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TEST RESULTS VIEW -->
+            <section id="results-view" class="view">
+                <div class="results-container">
+                    <div id="results-content"></div>
+                </div>
+            </section>
+
+            <!-- 3D LAB VIEW -->
+            <section id="lab-view" class="view">
+                <div class="lab-container">
+                    <div class="lab-toolbar">
+                        <h3><i class="fas fa-cube"></i> 3D Interactive Lab</h3>
+                        <div class="lab-tools">
+                            <button class="tool-btn active" data-tool="rotate" title="Rotate">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="tool-btn" data-tool="zoom" title="Zoom">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button class="tool-btn" data-tool="disassemble" title="Disassemble">
+                                <i class="fas fa-expand-arrows-alt"></i>
+                            </button>
+                            <button class="tool-btn" data-tool="identify" title="Identify Parts">
+                                <i class="fas fa-crosshairs"></i>
+                            </button>
+                            <button class="tool-btn" data-tool="screwdriver" title="Screwdriver">
+                                <i class="fas fa-screwdriver"></i>
+                            </button>
+                            <button class="tool-btn" data-tool="multimeter" title="Multimeter">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </button>
+                            <button class="tool-btn" data-tool="thermal" title="Thermal Camera">
+                                <i class="fas fa-temperature-high"></i>
+                            </button>
+                            <button class="tool-btn" data-tool="xray" title="X-Ray View">
+                                <i class="fas fa-x-ray"></i>
+                            </button>
+                        </div>
+                        <select id="lab-device-select" class="lab-select">
+                            <option value="desktop">Desktop Computer</option>
+                            <option value="laptop">Laptop</option>
+                            <option value="motherboard">Motherboard</option>
+                            <option value="cpu">CPU / Processor</option>
+                            <option value="gpu">Graphics Card</option>
+                            <option value="ram">RAM Module</option>
+                            <option value="hdd">Hard Disk Drive</option>
+                            <option value="ssd">SSD (Solid State Drive)</option>
+                            <option value="psu">Power Supply Unit</option>
+                            <option value="monitor">Monitor</option>
+                            <option value="keyboard">Keyboard</option>
+                            <option value="mouse">Mouse</option>
+                            <option value="printer">Printer</option>
+                            <option value="router">Router</option>
+                            <option value="smartphone">Smartphone</option>
+                            <option value="multimeter_device">Multimeter</option>
+                        </select>
+                        <button id="lab-close-btn" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Close Lab
+                        </button>
+                    </div>
+                    <div class="lab-main">
+                        <div id="lab-3d-viewport" class="lab-viewport"></div>
+                        <div id="lab-info-panel" class="lab-info-panel">
+                            <h4 id="lab-part-name">Select a component</h4>
+                            <div id="lab-part-info" class="lab-part-info">
+                                <p>Click on any part in the 3D view to see detailed information.</p>
+                            </div>
+                            <div id="lab-readings" class="lab-readings hidden">
+                                <h5>Tool Readings</h5>
+                                <div id="lab-reading-values"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lab-practical-tasks" id="lab-tasks-panel">
+                        <h4><i class="fas fa-tasks"></i> Practical Tasks</h4>
+                        <div id="lab-tasks-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NOTES VIEW -->
+            <section id="notes-view" class="view">
+                <div class="notes-container">
+                    <div class="notes-toolbar">
+                        <h3><i class="fas fa-sticky-note"></i> My Notes</h3>
+                        <div class="notes-tools">
+                            <button class="note-tool" data-command="bold" title="Bold">
+                                <i class="fas fa-bold"></i>
+                            </button>
+                            <button class="note-tool" data-command="italic" title="Italic">
+                                <i class="fas fa-italic"></i>
+                            </button>
+                            <button class="note-tool" data-command="underline" title="Underline">
+                                <i class="fas fa-underline"></i>
+                            </button>
+                            <button class="note-tool" data-command="strikeThrough" title="Strikethrough">
+                                <i class="fas fa-strikethrough"></i>
+                            </button>
+                            <span class="tool-divider"></span>
+                            <button class="note-tool" data-command="insertUnorderedList" title="Bullet List">
+                                <i class="fas fa-list-ul"></i>
+                            </button>
+                            <button class="note-tool" data-command="insertOrderedList" title="Numbered List">
+                                <i class="fas fa-list-ol"></i>
+                            </button>
+                            <span class="tool-divider"></span>
+                            <select id="note-heading" class="note-select">
+                                <option value="">Normal</option>
+                                <option value="h1">Heading 1</option>
+                                <option value="h2">Heading 2</option>
+                                <option value="h3">Heading 3</option>
+                            </select>
+                            <select id="note-font-size" class="note-select">
+                                <option value="3">Normal</option>
+                                <option value="1">Small</option>
+                                <option value="5">Large</option>
+                                <option value="7">Huge</option>
+                            </select>
+                            <input type="color" id="note-text-color" value="#ffffff" title="Text Color">
+                            <input type="color" id="note-highlight" value="#2a2a3e" title="Highlight">
+                            <span class="tool-divider"></span>
+                            <button class="note-tool" id="note-save" title="Save">
+                                <i class="fas fa-save"></i>
+                            </button>
+                            <button class="note-tool" id="note-export-pdf" title="Export PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
+                            <button class="note-tool" id="note-close" title="Close">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="notes-sidebar">
+                        <h4>Saved Notes</h4>
+                        <div id="notes-list" class="notes-list"></div>
+                        <button id="new-note-btn" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> New Note
+                        </button>
+                    </div>
+                    <div id="notes-editor" class="notes-editor" contenteditable="true">
+                        <h2>My Study Notes</h2>
+                        <p>Start typing your notes here...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- AI ASSISTANT -->
+        <div id="ai-assistant" class="ai-assistant">
+            <div class="ai-header" id="ai-header">
+                <div class="ai-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <span>TechBot AI Assistant</span>
+                <div class="ai-header-btns">
+                    <button id="ai-minimize" class="ai-btn"><i class="fas fa-minus"></i></button>
+                    <button id="ai-maximize" class="ai-btn"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+            <div class="ai-messages" id="ai-messages">
+                <div class="ai-msg bot">
+                    <div class="msg-avatar"><i class="fas fa-robot"></i></div>
+                    <div class="msg-content">
+                        <p>Hi! I'm <strong>TechBot</strong>, your AI learning assistant. I can:</p>
+                        <ul>
+                            <li>🔧 Explain any computer repair concept</li>
+                            <li>📖 Clarify lesson content</li>
+                            <li>🧪 Guide you through practical exercises</li>
+                            <li>❓ Answer any technical question</li>
+                            <li>🔍 Help diagnose hardware problems</li>
+                        </ul>
+                        <p>Ask me anything!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="ai-input-area">
+                <div class="ai-quick-prompts">
+                    <button class="quick-prompt" data-prompt="Explain this unit in simple terms">Simplify</button>
+                    <button class="quick-prompt" data-prompt="Give me a real-world example">Example</button>
+                    <button class="quick-prompt" data-prompt="What are common mistakes to avoid?">Mistakes</button>
+                    <button class="quick-prompt" data-prompt="How do I troubleshoot this?">Troubleshoot</button>
+                </div>
+                <div class="ai-input-row">
+                    <button id="ai-voice-input" class="ai-btn" title="Voice Input">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <textarea id="ai-input" placeholder="Ask TechBot anything..." rows="1"></textarea>
+                    <button id="ai-send" class="ai-btn ai-send-btn" title="Send">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Toggle Button -->
+        <button id="ai-toggle-btn" class="ai-toggle-btn">
+            <i class="fas fa-robot"></i>
+            <span class="ai-badge hidden" id="ai-badge">1</span>
+        </button>
+
+        <!-- MODALS -->
+        <!-- Profile Modal -->
+        <div id="profile-modal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-cog"></i> Student Profile</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="profile-form">
+                        <label>Your Name
+                            <input type="text" id="profile-name" placeholder="Enter your name">
+                        </label>
+                        <label>Experience Level
+                            <select id="profile-level">
+                                <option value="beginner">Complete Beginner</option>
+                                <option value="basic">Basic Knowledge</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                                <option value="professional">Professional</option>
+                            </select>
+                        </label>
+                        <label>Learning Goal
+                            <select id="profile-goal">
+                                <option value="hobby">Hobby / Personal Interest</option>
+                                <option value="career">Career in IT Support</option>
+                                <option value="certification">CompTIA A+ Certification</option>
+                                <option value="business">Start Repair Business</option>
+                            </select>
+                        </label>
+                        <label>
+                            <input type="checkbox" id="profile-accessibility"> Enable Accessibility Features (larger text, high contrast, voice narration)
+                        </label>
+                        <button id="save-profile" class="btn btn-primary">Save Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievement Modal -->
+        <div id="achievement-modal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content achievement-popup">
+                <div class="achievement-icon" id="achievement-icon">🏆</div>
+                <h2 id="achievement-title">Achievement Unlocked!</h2>
+                <p id="achievement-desc">You've earned a new badge!</p>
+                <div id="achievement-xp" class="xp-reward">+50 XP</div>
+                <button class="btn btn-primary modal-close">Awesome!</button>
+            </div>
+        </div>
+
+        <!-- Font Size Modal -->
+        <div id="fontsize-modal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-sm">
+                <div class="modal-header">
+                    <h3>Text Size</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <input type="range" id="fontsize-slider" min="12" max="24" value="16" step="1">
+                    <span id="fontsize-display">16px</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="toast-container" class="toast-container"></div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/units-data.js"></script>
+    <script src="/js/text-to-speech.js"></script>
+    <script src="/js/cartoon-teacher.js"></script>
+    <script src="/js/3d-simulator.js"></script>
+    <script type="module">
+        import { AIAssistant } from '/js/ai-assistant.js';
+        window.AIAssistant = AIAssistant;
+    </script>
+    <script src="/js/test-engine.js"></script>
+    <script src="/js/notes-editor.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
